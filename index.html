@@ -50,7 +50,10 @@
   <div class="container">
     <h2>To-Do List</h2>
     <input type="text" id="nova-tarefa" placeholder="Digite sua tarefa aqui...">
-    <button id="adicionar-tarefa">Adicionar</button>
+    <button id="adicionar-tarefa" style="margin-top: 20px; background-color: #17d531; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Adicionar</button>
+    <button id="remover-todas" style="margin-top: 20px; background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+      Remover Todas as Tarefas
+    </button>
   <ul id="lista-tarefas"></ul>
   </div><script>// Selecionando elementos da página
     const inputTarefa = document.getElementById('nova-tarefa');
@@ -59,12 +62,14 @@
 
     // Função para salvar as tarefas no localStorage
     function salvarTarefas() {
-      const tarefas = [];
-      listaTarefas.querySelectorAll('li').forEach((item) => {
-        tarefas.push({ texto: item.textContent, feito: item.classList.contains('feito') });
-      });
-      localStorage.setItem('tarefas', JSON.stringify(tarefas));
-    }
+  const tarefas = [];
+  listaTarefas.querySelectorAll('li').forEach((item) => {
+    const texto = item.querySelector('span').textContent;
+    const feito = item.querySelector('span').classList.contains('feito');
+    tarefas.push({ texto, feito });
+  });
+  localStorage.setItem('tarefas', JSON.stringify(tarefas));
+}
 
     // Função para carregar as tarefas do localStorage
     function carregarTarefas() {
@@ -89,33 +94,58 @@
     }
 
     // Função para adicionar uma nova tarefa
-    function adicionarTarefa() {
-      const textoTarefa = inputTarefa.value.trim(); // Remove espaços extras
+    // Função para adicionar uma nova tarefa
+function adicionarTarefa() {
+  const textoTarefa = inputTarefa.value.trim(); // Remove espaços extras
 
-      if (textoTarefa === '') {
-        alert('Por favor, digite uma tarefa!');
-        return;
-      }
+  if (textoTarefa === '') {
+    alert('Por favor, digite uma tarefa!');
+    return;
+  }
 
-      // Criando um item da lista
-      const itemLista = document.createElement('li');
-      itemLista.textContent = textoTarefa;
+  // Criando um item da lista
+  const itemLista = document.createElement('li');
 
-      // Adicionar evento para marcar como feito
-      itemLista.addEventListener('click', function () {
-        itemLista.classList.toggle('feito');
-        salvarTarefas();
-      });
+  // Criando o texto da tarefa
+  const texto = document.createElement('span');
+  texto.textContent = textoTarefa;
 
-      // Adiciona o item na lista
-      listaTarefas.appendChild(itemLista);
+  // Criando o botão de remover
+  const botaoRemover = document.createElement('button');
+  botaoRemover.textContent = 'Remover';
+  botaoRemover.style.marginLeft = '10px'; // Adiciona um pequeno espaço
+  botaoRemover.style.backgroundColor = '#dc3545'; // Cor vermelha
+  botaoRemover.style.color = 'white'; // Cor do texto
+  botaoRemover.style.border = 'none'; // Remove bordas
+  botaoRemover.style.padding = '5px 10px'; // Adiciona padding
+  botaoRemover.style.borderRadius = '5px'; // Arredonda os cantos
+  botaoRemover.style.cursor = 'pointer'; // Adiciona um cursor de botão
 
-      // Salvar as tarefas no localStorage
-      salvarTarefas();
+  // Evento para remover a tarefa
+  botaoRemover.addEventListener('click', function () {
+    itemLista.remove();
+    salvarTarefas(); // Atualiza o localStorage
+  });
 
-      // Limpa o campo de texto
-      inputTarefa.value = '';
-    }
+  // Adicionar evento para marcar como feito
+  texto.addEventListener('click', function () {
+    texto.classList.toggle('feito');
+    salvarTarefas(); // Atualiza o localStorage
+  });
+
+  // Montando o item da lista
+  itemLista.appendChild(texto);
+  itemLista.appendChild(botaoRemover);
+
+  // Adiciona o item na lista
+  listaTarefas.appendChild(itemLista);
+
+  // Salvar as tarefas no localStorage
+  salvarTarefas();
+
+  // Limpa o campo de texto
+  inputTarefa.value = '';
+}
 
     // Adicionando evento ao botão
     botaoAdicionar.addEventListener('click', adicionarTarefa);
@@ -129,6 +159,19 @@
 
     // Carregar tarefas ao iniciar a página
     carregarTarefas();
+    // Selecionando o botão de "Remover Todas as Tarefas"
+const botaoRemoverTodas = document.getElementById('remover-todas');
+
+// Função para remover todas as tarefas
+function removerTodasTarefas() {
+  if (confirm('Tem certeza que deseja remover todas as tarefas?')) {
+    listaTarefas.innerHTML = ''; // Remove todos os itens da lista
+    localStorage.removeItem('tarefas'); // Limpa o localStorage
+  }
+}
+
+// Adiciona o evento de clique no botão
+botaoRemoverTodas.addEventListener('click', removerTodasTarefas);
   </script>
 </body>
 </html>
